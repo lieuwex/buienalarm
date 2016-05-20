@@ -57,8 +57,10 @@ func main() {
 				t = t.Add(5 * time.Minute)
 			}
 
-			break
+			return
 		}
 	}
 
+	fmt.Fprintf(os.Stderr, "location not found: '%s'\n", location)
+	os.Exit(1)
 }
