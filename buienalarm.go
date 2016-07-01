@@ -79,7 +79,7 @@ func main() {
 
 	resp, err := http.Get("http://www.buienalarm.nl/location/" + location)
 	if err != nil {
-		fmt.Println("Couldn't retreive forecast data from Buienalarm. ")
+		fmt.Println("Couldn't retrieve forecast data from Buienalarm. ")
 		panic(err)
 	}
 	defer resp.Body.Close()
