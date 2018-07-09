@@ -18,23 +18,27 @@ type weatherInfo struct {
 	Raw     []float64 `json:"raw"`
 }
 
-func (info weatherInfo) getAmount() [25]float64 {
-	var result [25]float64
+func (info weatherInfo) getAmount() []float64 {
+	var result []float64
 
 	if info.fullDay {
-		for i, val := range info.Raw {
-			result[i] = val
+		for _, val := range info.Raw {
+			result = append(result, val)
 		}
 	} else {
-		for i, val := range info.Precip {
-			result[i] = math.Pow(10, float64((val-109)/32))
+		for _, val := range info.Precip {
+			val = math.Pow(10, float64((val-109)/32))
+			result = append(result, val)
 		}
 	}
 
+	if len(result) > 25 {
+		result = result[:25]
+	}
 	return result
 }
 
-func parseString(s string, fullDay bool) weatherInfo {
+func parseString(s string) weatherInfo {
 	x := strings.Split(s, " ")
 	raw := strings.Replace(x[len(x)-1], ";", "", -1)
 
@@ -45,7 +49,6 @@ func parseString(s string, fullDay bool) weatherInfo {
 		panic(err)
 	}
 
-	data.fullDay = fullDay
 	return data
 }
 
@@ -94,7 +97,8 @@ func main() {
 	body, _ := ioutil.ReadAll(resp.Body)
 	for _, line := range strings.Split(string(body), "\n") {
 		if strings.Contains(line, matchString) {
-			data := parseString(line, fullDay)
+			data := parseString(line)
+			data.fullDay = fullDay
 
 			t := time.Unix(int64(data.Start), 0)
 			for _, val := range data.getAmount() {
