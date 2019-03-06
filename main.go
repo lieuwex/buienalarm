@@ -34,18 +34,19 @@ func main() {
 		locstr = os.Args[2]
 	}
 
-	if fullDay {
-		// TODO: fix
-		panic("sorry fullDay is broken currently")
-	}
-
 	loc, err := location.Geocode(locstr)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "error during geocode, maybe unknown location?")
 		os.Exit(1)
 	}
 
-	info, err := fetch(loc.Lat, loc.Lng)
+	info, err := func() ([]timepoint, error) {
+		if fullDay {
+			return fetchFullDay(loc.Lat, loc.Lng)
+		}
+
+		return fetchTwoHours(loc.Lat, loc.Lng)
+	}()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Couldn't retrieve forecast data from Buienradar: %s\n", err)
 		os.Exit(1)
@@ -56,7 +57,7 @@ func main() {
 			"%02d:%02d: %.1fmm/u\n",
 			point.Time.Hour(),
 			point.Time.Minute(),
-			point.Percip,
+			point.Precipation,
 		)
 	}
 }
