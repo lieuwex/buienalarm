@@ -52,6 +52,10 @@ func main() {
 		os.Exit(1)
 	}
 
+	if len(info) == 0 {
+		fmt.Fprintln(os.Stderr, "Warning: Empty body received from Buienradar")
+	}
+
 	for _, point := range info {
 		fmt.Printf(
 			"%02d:%02d: %.1fmm/u\n",
